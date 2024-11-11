@@ -28,7 +28,7 @@ public class CsvWriter {
                         channel.getLanguage() != null ? channel.getLanguage() : "Не указан",
                         String.join(";", channel.getTags()),
                         channel.isChildFriendly() ? "Да" : "Нет",
-                        channel.getContactEmail() != null ? channel.getContactEmail() : "Не указано"
+                        channel.getContactEmail()
                 ));
                 csvWriter.append("\n");
             }

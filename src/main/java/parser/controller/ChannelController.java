@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import parser.model.dto.ChannelRequestWithSubscribersDto;
-import parser.model.dto.ChannelRequestWithoutSubscribersDto;
+import parser.model.dto.ChannelRequestDto;
 import parser.model.entity.ChannelData;
 import parser.model.service.CsvWriter;
 import parser.model.service.YouTubeParser;
@@ -22,12 +21,12 @@ public class ChannelController {
     private final YouTubeParser youTubeParser;
 
     @PostMapping("/with-subscribers")
-    public ResponseEntity<String> getChannelsWithSubscribers(@RequestBody ChannelRequestWithSubscribersDto request) {
+    public ResponseEntity<String> getChannelsWithSubscribers(@RequestBody ChannelRequestDto request) {
         return processChannels(request.getKeyword(), request.getMinSubscribers());
     }
 
     @PostMapping("/without-subscribers")
-    public ResponseEntity<String> getChannelsWithoutSubscribers(@RequestBody ChannelRequestWithoutSubscribersDto request) {
+    public ResponseEntity<String> getChannelsWithoutSubscribers(@RequestBody ChannelRequestDto request) {
         return processChannels(request.getKeyword(), null);
     }
 
@@ -43,9 +42,9 @@ public class ChannelController {
             }
 
             log.info("Found {} channels", channelIds.size());
-            for (String channelId : channelIds) {
-                channels.add(youTubeParser.getChannelData(channelId));
-                log.info("Channel {} saved", channelId);
+            for (int i = 0; i < YouTubeParser.MAX_RESULTS_PER_PAGE; i++) {
+                channels.add(youTubeParser.getChannelData(channelIds.get(i)));
+                log.info("Channel {} saved", channelIds.get(i));
             }
 
             csvWriter.writeChannelsToCsv(channels, "youtube_channels.csv");
